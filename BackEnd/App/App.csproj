@@ -7,10 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Commands\" />
-    <Folder Include="Features\Queries\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Mappings\" />
+    <PackageReference Include="AutoMapper" Version="15.1.0" />
+    <PackageReference Include="FluentValidation" Version="12.1.0" />
+    <PackageReference Include="MediatR" Version="13.1.0" />
   </ItemGroup>
 
 </Project>

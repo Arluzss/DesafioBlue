@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Desafio.Infrastructure.Context;
+using Infrastructure.Context;
 
 namespace Api.Controllers
 {

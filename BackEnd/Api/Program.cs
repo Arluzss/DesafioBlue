@@ -1,5 +1,10 @@
-using Desafio.Infrastructure.Context;
+using App.Features.Commands.CreateContact;
+using App.Interfaces;
+using App.Mappings;
+using Infrastructure.Context;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 namespace Api
 {
@@ -14,6 +19,13 @@ namespace Api
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DbConnection"))
              );
+
+            builder.Services.AddScoped<IContactRepository, ContactRepository>();
+
+            builder.Services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(typeof(CreateContactCommand).Assembly));
+            builder.Services.AddAutoMapper(cfg => { }, typeof(ContactProfile));
+            builder.Services.AddValidatorsFromAssemblyContaining<CreateContactValidator>();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
