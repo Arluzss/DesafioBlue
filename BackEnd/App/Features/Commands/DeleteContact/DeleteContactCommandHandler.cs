@@ -14,7 +14,7 @@ namespace App.Features.Commands.DeleteContact
             var contact = await _repository.GetByIdAsync(request.Id, ct);
             if (contact == null)
             {
-                throw new KeyNotFoundException("Contato não encontrado.");
+                //throw new KeyNotFoundException("Contato não encontrado.");
             }
             await _repository.DeleteAsync(request.Id);
             return Unit.Value;

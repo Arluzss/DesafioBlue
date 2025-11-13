@@ -14,6 +14,16 @@ namespace Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("CorsForAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
             builder.Services.AddControllers();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -41,7 +51,7 @@ namespace Api
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Agenda API V1");
                 });
             }
-
+            app.UseCors("CorsForAll");
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();

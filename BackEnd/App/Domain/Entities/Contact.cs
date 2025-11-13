@@ -7,6 +7,7 @@ namespace App.Domain.Entities
     public class Contact
     {
         [Column("id")]
+        /// <example>Maria Santos</example>
         public Guid Id { get; set; } = Guid.NewGuid();
         [Column("name")]
         public string? Name { get; set; }

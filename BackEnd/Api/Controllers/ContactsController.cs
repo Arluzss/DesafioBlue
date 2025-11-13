@@ -18,7 +18,7 @@ namespace Api.Controllers
         {
             _mediator = mediator;
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> Create(
         [FromBody] CreateContactCommand command,
@@ -28,7 +28,10 @@ namespace Api.Controllers
             var validationResult = await validator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                return BadRequest(validationResult.Errors.Select(e => new {
+                    field = e.PropertyName,
+                    message = e.ErrorMessage
+                }));
             }
 
             var result = await _mediator.Send(command);
