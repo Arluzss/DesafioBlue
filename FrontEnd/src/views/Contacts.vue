@@ -1,13 +1,12 @@
 <template>
   <Card class="m-4 shadow-2">
-    <template #title>Lista de Contatos</template>
-    <template #subtitle>Gerencie seus contatos aqui</template>
-
     <template #content>
-      <div class="mb-3">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h2>Lista de Contatos</h2>
+        </div>
         <Button label="Novo Contato" icon="pi pi-plus" class="p-button-sm p-button-success" @click="add" />
       </div>
-
       <FormContact :newContact="newContact" @save="saveContact" @cancel="cancelSaveContact" />
 
       <DataTable :value="contacts" responsiveLayout="scroll" class="p-datatable-sm">
@@ -29,10 +28,10 @@
           </template>
         </Column>
 
-        <Column header="Ações" style="width: fit-content; text-align: center">
+        <Column header="Ações" style="width: fit-content;">
           <template #body="{ data }">
-            <div class="flex gap-2">
-              <Button icon="pi pi-eye" class="p-button-text p-button-sm" @click=""/>
+            <div class="flex justify-center gap-2 w-full">
+              <Button icon="pi pi-eye" class="p-button-text p-button-sm" @click="" />
               <Button v-if="editing !== data.id" icon="pi pi-pencil" class="p-button-text p-button-sm"
                 @click="edit(data.id)" />
               <Button v-if="editing === data.id" icon="pi pi-check" class="p-button-text p-button-success p-button-sm"
@@ -52,10 +51,12 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import InputText from 'primevue/inputtext'
-import EditableCell from './EditableCell.vue'
+import EditableCell from '../components/EditableCell.vue'
 import ContactService from '../services/ContactService'
-import FormContact from './FormContact.vue'
+import FormContact from '../components/FormContact.vue'
+import { useToast } from "primevue";
+
+const toast = useToast();
 
 var contacts = ref([])
 
@@ -74,29 +75,71 @@ const edit = (id) => {
 }
 
 async function changeContact(data) {
-  await ContactService.updateContact(data.id, data);
-  await loadContacts();
-  editing.value = null
+  try {
+    await ContactService.updateContact(data.id, data);
+    await loadContacts();
+    editing.value = null
+
+    toast.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: 'Contato atualizado com sucesso!',
+      life: 3000
+    });
+  } catch (error) {
+    const errors = error.response.data.errors;
+
+    Object.keys(errors).forEach(field => {
+      toast.add({
+        severity: 'error',
+        summary: `Erro no campo ${field}`,
+        detail: errors[field].join(', '),
+        life: 4000
+      });
+    });
+  }
 }
 
 async function remove(id) {
-  await ContactService.deleteContact(id);
-  loadContacts();
+  try {
+    await deleteContact(id);
+    loadContacts();
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao deletar contato!', life: 3000 });
+  }
 }
 
 const add = () => {
   newContact.value = {
-    id: Date.now(),
-    name: 'Nome',
-    email: 'Email',
-    phone: 'Telefone'
+    name: '',
+    email: '',
+    phone: ''
   }
 }
 
 async function saveContact() {
-  await ContactService.createContact(newContact.value)
-  newContact.value = null
-  loadContacts()
+  try {
+    await ContactService.createContact(newContact.value)
+    newContact.value = null
+    loadContacts()
+    toast.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: 'Contato criado com sucesso!',
+      life: 3000
+    });
+  } catch (error) {
+    const errors = error.response.data.errors;
+
+    Object.keys(errors).forEach(field => {
+      toast.add({
+        severity: 'error',
+        summary: `Erro no campo ${field}`,
+        detail: errors[field].join(', '),
+        life: 4000
+      });
+    });
+  }
 }
 
 const cancelSaveContact = () => {

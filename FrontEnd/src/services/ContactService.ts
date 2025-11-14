@@ -18,6 +18,7 @@ export default {
     email: string;
     phone: string;
   }) => {
+    console.log("Creating contact with data:", contactData);
     const response = await API.post("/contacts", contactData);
     return response.data;
   },

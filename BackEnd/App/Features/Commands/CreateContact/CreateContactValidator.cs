@@ -17,7 +17,7 @@ namespace App.Features.Commands.CreateContact
 
                 RuleFor(x => x.Phone)
                     .NotEmpty().WithMessage("O número do telefone é obrigatório")
-                    .Matches(@"^\(\d{2}\) \d{4,5}-\d{4}$").WithMessage("Formato inválido (ex: (81) 9343-3456)");
+                    .Matches(@"^\(\d{2}\) \d{4,5}-\d{4}$").WithMessage("Formato válido (ex: (81) 9343-3456)");
         }
     }
 }
