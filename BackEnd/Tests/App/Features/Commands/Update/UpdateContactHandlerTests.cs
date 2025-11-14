@@ -1,4 +1,5 @@
 ﻿using App.Domain.Entities;
+using App.DTOs;
 using App.Features.Commands.UpdateContact;
 using App.Interfaces;
 using AutoMapper;
@@ -19,7 +20,14 @@ namespace Tests.App.Features.Commands.Update
 
             var mapperMock = new Mock<IMapper>();
             var handler = new UpdateContactCommandHandler(repoMock.Object, mapperMock.Object);
-            var command = new UpdateContactCommand(Guid.NewGuid(), "A", "P@z.com", "444");
+
+            var dto = new ContactDto(
+                Guid.NewGuid(),
+                "",
+                "email@teste.com",
+                "(81) 99999-9999"
+            );
+            var command = new UpdateContactCommand(dto);
 
             await Assert.ThrowsAsync<KeyNotFoundException>(
                 () => handler.Handle(command, CancellationToken.None)
@@ -48,13 +56,20 @@ namespace Tests.App.Features.Commands.Update
                 .Setup(m => m.Map(It.IsAny<UpdateContactCommand>(), It.IsAny<Contact>()))
                 .Callback<UpdateContactCommand, Contact>((command, ct) =>
                 {
-                    ct.Name = command.Name;
-                    ct.Email = command.Email;
-                    ct.Phone = command.Phone;
+                    ct.Name = command.ContactDto.Name;
+                    ct.Email = command.ContactDto.Email;
+                    ct.Phone = command.ContactDto.Phone;
                 });
 
             var handler = new UpdateContactCommandHandler(repoMock.Object, mapperMock.Object);
-            var command = new UpdateContactCommand(existing.Id, "BBbb", "Bbb@t.com", "444");
+
+            var dto = new ContactDto(
+                existing.Id,
+                "BBbb",
+                "Bbb@t.com",
+                "444"
+            );
+            var command = new UpdateContactCommand(dto);
 
             var before = DateTime.UtcNow;
 
@@ -68,9 +83,9 @@ namespace Tests.App.Features.Commands.Update
             repoMock.Verify(r => r.UpdateAsync(
                 It.Is<Contact>(c =>
                     c.Id == existing.Id
-                 && c.Name == command.Name
-                 && c.Email == command.Email
-                 && c.Phone == command.Phone
+                    && c.Name == command.ContactDto.Name
+                    && c.Email == command.ContactDto.Email
+                    && c.Phone == command.ContactDto.Phone
                 ),
                 CancellationToken.None
             ), Times.Once);

@@ -17,7 +17,7 @@ namespace App.Features.Commands.UpdateContact
 
         public async Task<Unit> Handle(UpdateContactCommand request, CancellationToken ct)
         {
-            var contact = await _repository.GetByIdAsync(request.Id, ct);
+            var contact = await _repository.GetByIdAsync(request.ContactDto.Id, ct);
             if (contact == null)
                 throw new KeyNotFoundException("Contato não encontrado.");
 

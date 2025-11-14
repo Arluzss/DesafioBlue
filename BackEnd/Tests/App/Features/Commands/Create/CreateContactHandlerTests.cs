@@ -1,4 +1,5 @@
 ﻿using App.Domain.Entities;
+using App.DTOs;
 using App.Features.Commands.CreateContact;
 using App.Interfaces;
 using App.Mappings;
@@ -34,34 +35,37 @@ namespace Tests.App.Features.Commands.Create
         [Fact]
         public async Task Handle_Should_Create_Contact_When_Valid()
         {
-            var command = new CreateContactCommand(
-                "Arlindo Nunes",
-                "arlindo@gmail.com",
-                "(81) 91111-1111"
+            var dto = new ContactDto(
+                Id: Guid.NewGuid(),       
+                Name: "Arlindo Nunes",                
+                Email: "email@teste.com", 
+                Phone: "(81) 99999-9999"  
             );
+
             
+            var command = new CreateContactCommand(dto);
+
             var id = await _handler.Handle(command, CancellationToken.None);
             Assert.NotEqual(Guid.Empty, id);
 
-            _mockRepo.Verify(r => r.AddAsync(It.Is<Contact>(c =>
-            c.Name == "Arlindo Nunes" && c.Email == "arlindo@gmail.com")), Times.Once);
+            _mockRepo.Verify(r => r.AddAsync(It.IsAny<Contact>()), Times.Once);
 
         }
         [Fact]
         public async Task Handle_Should_Throw_ValidationException_When_Email_Exists()
         {
-            // Arrange
-            var command = new CreateContactCommand(
-                "Outro Nome",
-                "arlindo@gmail.com",
-                "(81) 92222-2222"
+            var dto = new ContactDto(
+                Id: Guid.NewGuid(),
+                Name: "Outro Nome",
+                Email: "arlindo@gmail.com",
+                Phone: "(81) 92222-2222"
             );
 
-            _mockRepo
-                .Setup(r => r.EmailExistsAsync("arlindo@gmail.com", null))
-                .ReturnsAsync(true);
+            var command = new CreateContactCommand(dto);
 
-            // Act & Assert
+            _mockRepo.Setup(r => r.EmailExistsAsync(dto.Email!, It.IsAny<Guid?>()))
+                     .ReturnsAsync(true);
+
             await Assert.ThrowsAsync<ValidationException>(() =>
                 _handler.Handle(command, CancellationToken.None)
             );

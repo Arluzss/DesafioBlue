@@ -1,10 +1,13 @@
+using App.DTOs;
 using App.Features.Commands.CreateContact;
 using App.Interfaces;
 using App.Mappings;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.Context;
 using Infrastructure.Repositories;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using FluentValidation;
 
 namespace Api
 {
@@ -35,14 +38,18 @@ namespace Api
             builder.Services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(typeof(CreateContactCommand).Assembly));
             builder.Services.AddAutoMapper(cfg => { }, typeof(ContactProfile));
+            //builder.Services.AddValidatorsFromAssemblyContaining<CreateContactValidator>();
+            //builder.Services.AddTransient<IValidator<ContactDto>, CreateContactValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<CreateContactValidator>();
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddFluentValidationClientsideAdapters();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configure the HTTP resequest pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

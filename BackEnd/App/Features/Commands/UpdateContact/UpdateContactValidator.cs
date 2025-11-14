@@ -11,25 +11,25 @@ namespace App.Features.Commands.UpdateContact
         {
             _repository = repository;
 
-            RuleFor(x => x.Id).NotEmpty();
+            RuleFor(x => x.ContactDto.Id).NotEmpty();
 
-            RuleFor(x => x.Name)
+            RuleFor(x => x.ContactDto.Name)
                 .NotEmpty().WithMessage("Nome é obrigatório")
                 .MaximumLength(100).WithMessage("Máximo de 100 caracteres");
 
-            RuleFor(x => x.Email)
+            RuleFor(x => x.ContactDto.Email)
                 .NotEmpty().WithMessage("E-mail é obrigatório")
                 .EmailAddress().WithMessage("E-mail inválido")
                 .MustAsync(BeUniqueEmail).WithMessage("E-mail já está em uso");
 
-            RuleFor(x => x.Phone)
+            RuleFor(x => x.ContactDto.Phone)
                 .NotEmpty().WithMessage("Telefone é obrigatório")
                 .Matches(@"^\(\d{2}\) \d{4,5}-\d{4}$").WithMessage("Formato inválido");
         }
 
         private async Task<bool> BeUniqueEmail(UpdateContactCommand command, string email, CancellationToken ct)
         {
-            return !await _repository.EmailExistsAsync(email, command.Id);
+            return !await _repository.EmailExistsAsync(email, command.ContactDto.Id);
         }
     }
 }

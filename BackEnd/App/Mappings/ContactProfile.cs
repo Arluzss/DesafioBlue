@@ -10,6 +10,7 @@ namespace App.Mappings
     {
         public ContactProfile()
         {
+            CreateMap<ContactDto, Contact>();
             CreateMap<Contact, ContactDto>();
 
             CreateMap<CreateContactCommand, Contact>()

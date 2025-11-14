@@ -1,8 +1,9 @@
-﻿using FluentValidation;
+﻿using App.DTOs;
+using FluentValidation;
 
 namespace App.Features.Commands.CreateContact
 {
-    public class CreateContactValidator : AbstractValidator<CreateContactCommand>
+    public class CreateContactValidator : AbstractValidator<ContactDto>
     {
             public CreateContactValidator()
             {

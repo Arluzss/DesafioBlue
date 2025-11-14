@@ -1,11 +1,13 @@
-﻿using App.Features.Commands.CreateContact;
+﻿using App.DTOs;
+using App.Features.Commands.CreateContact;
 using App.Features.Commands.DeleteContact;
 using App.Features.Commands.UpdateContact;
 using App.Features.Queries.GetAllContacts;
 using App.Features.Queries.GetContactById;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+
+
 namespace Api.Controllers
 {
     [ApiController]
@@ -20,22 +22,10 @@ namespace Api.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> Create(
-        [FromBody] CreateContactCommand command,
-        [FromServices] IValidator<CreateContactCommand> validator
-        )
+        public async Task<IActionResult> Create([FromBody] ContactDto contact)
         {
-            var validationResult = await validator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors.Select(e => new {
-                    field = e.PropertyName,
-                    message = e.ErrorMessage
-                }));
-            }
-
-            var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = result }, result);
+            var result = await _mediator.Send(new CreateContactCommand(contact));
+            return Ok(result);
         }
 
 
@@ -62,21 +52,10 @@ namespace Api.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(
-        Guid id,
-        [FromBody] UpdateContactCommand command,
-        [FromServices] IValidator<UpdateContactCommand> validator, CancellationToken ct)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] ContactDto command, CancellationToken ct)
         {
-            Console.WriteLine(id);
-            if (id != command.Id)
-                return BadRequest("ID da rota não corresponde ao ID do corpo");
-
-            var validationResult = await validator.ValidateAsync(command, ct);
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult.Errors);
-
-            await _mediator.Send(command, ct);
+            await _mediator.Send(new UpdateContactCommand(command), ct);
             return NoContent();
         }
     }

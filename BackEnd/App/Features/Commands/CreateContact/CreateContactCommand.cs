@@ -1,6 +1,7 @@
-﻿using MediatR;
+﻿using App.DTOs;
+using MediatR;
 
 namespace App.Features.Commands.CreateContact
 {
-    public record CreateContactCommand(string Name, string Email, string Phone) : IRequest<Guid>;
+    public record CreateContactCommand(ContactDto ContactDto) : IRequest<Guid>;
 }
